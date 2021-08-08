@@ -1,47 +1,31 @@
-# Getting Started with Create React App
+# Ecommerce 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+电商系统的前端
 
-## Available Scripts
+## 启动mongoDB
+```
+brew services run mongodb-community   # 启动
+brew services stop mongodb-community  # 停止
+```
 
-In the project directory, you can run:
+- 数据库配置文件：`/usr/local/etc/mongod.conf`
+- 数据库文件默认存放位置：`/usr/local/var/mongodb`
+- 日志存放位置：`/usr/local/var/log/mongodb/mongo.log`
 
-### `yarn start`
+## 0) 根据环境切换API接口地址
+在根目录下创建`.env`文件
+```
+REACT_APP_PRODUCTION_API_URL=http://fullstack.net.cn/api
+REACT_APP_DEVLOPMENT_API_URL=http://localhost/api
+```
+直接用`REACT_APP_PRODUCTION_API_URL`很长很麻烦，我们可以创建一个config把实际上用的API接口存起来，以后就直接用`API`这个变量就行了。
+```ts
+// src/config.ts
+export let API: string
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-# ecommerce
+if (process.env.NODE_ENV === "development") {
+  API = process.env.REACT_APP_DEVLOPMENT_API_URL!     // 感叹号表示这个变量一定会存在，不会是undefined，所以let API:string就不会报错，不然要let API:stirng | undefined
+} else if (process.env.NODE_ENV === "production") {
+  API = process.env.REACT_APP_PRODUCTION_API_URL!
+}
+```

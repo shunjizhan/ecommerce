@@ -1,0 +1,1 @@
+export default (state: number = 0) => state;

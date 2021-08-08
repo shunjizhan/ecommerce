@@ -1,10 +1,16 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router';
+import Routes from './components/Routes';
+import store, { history } from './store';
 
 function App() {
   return (
-    <div className="App">
-      App works
-    </div>
+    <Provider store={ store }>
+      <ConnectedRouter history={ history }>
+        <Routes />
+      </ConnectedRouter>
+    </Provider>
   );
 }
 

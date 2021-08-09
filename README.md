@@ -222,3 +222,98 @@ const Signup = () => {
 
 ## 7) 处理注册结果
 这里主要使用到useSelector来拿到当前的signup状态，然后根据状态用Result组件来表示给用户看。
+
+## 8) 处理登陆结果
+如果登陆成功，要把登陆结果的jwt储存在localStorage里面，还要储存在store里面
+```ts
+// src/store/sagas/auth.saga.ts
+function* handleSignin (action: SigninAction): any {
+  try {
+    const res = yield axios.post(`${API}/signin`, action.payload);
+    window.localStorage.setItem('jwt', JSON.stringify(res.data));
+    yield put(signinSuccess());
+  } catch (e) {
+    yield put(signinFail(e.response.data.error));
+  }
+}
+```
+
+之后我们就可以根据是否登陆，以及用户的身份，显示不同的界面。因为经常用到这个逻辑，我们需要一个helper来判断是否登陆，以后可以到处复用这个helper。
+```ts
+// src/helpers/auth.ts
+import { Jwt } from "../store/models/auth";
+
+export function isAuth (): boolean | Jwt {
+  const jwt = window.localStorage.getItem('jwt');
+  if (jwt) {
+    return JSON.parse(jwt);
+  }
+
+  return false;
+}
+```
+
+有了登陆信息，我们就可以在用户登陆之后，根据role跳转到dashboard
+```ts
+// src/components/core/Signin.tsx
+const redirectToDashboard = () => {
+  const auth = isAuth();
+  if (auth) {
+    const { user: { role }} = auth as Jwt;    // Auth的type有可能是false，所以这里告诉TS这里确定是Jwt type
+
+    if (role === 0) {   // 用户
+      return <Redirect to='/user/dashboard' />
+    } else {            // 管理员
+      return <Redirect to='/admin/dashboard' />
+    }
+  }
+}
+```
+
+在导航栏，如果登陆了，就显示dashboad的link，如果没有，就显示注册/登陆的link
+```tsx
+// src/components/core/Navigation.tsx
+const Navigation = () => {
+  ...
+  function getDashboardUrl () {
+    let url = '/user/dashboard';
+
+    const auth = isAuth();
+    if (auth) {
+      const {
+        user: { role },
+      } = auth as Jwt;
+
+      if (role === 1) {
+        url = '/admin/dashboard';
+      }
+    }
+
+    return url;
+  }
+
+  return (
+    <Menu mode='horizontal' selectable={ false }>
+      ...
+      {
+        !isAuth() && (<>
+          <Menu.Item className={ isSignin }>
+            <Link to='/signin'>登陆</Link>
+          </Menu.Item>
+          <Menu.Item className={ isSignup }>
+            <Link to='/signup'>注册</Link>
+          </Menu.Item>
+        </>)
+      }
+      {
+        isAuth() && (<>
+          <Menu.Item className={ isDashboard }>
+            <Link to={ getDashboardUrl() }>dashboard</Link>
+          </Menu.Item>
+        </>)
+      }
+    </Menu>
+  )
+}
+```
+

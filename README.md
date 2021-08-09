@@ -67,8 +67,11 @@ export const history = createHashHistory();
 const store = createStore(createRootReducer(history), applyMiddleware(routerMiddleware(history)));
 ```
 
-## 3) 创建导航
+## 3) 创建导航组件
 用antd的导航组件
 
-## 4) 页头
+## 4) 页头组件
 用antd的PageHeader组件，并且加上了一些很酷的css
+
+## 5) 登陆和注册组件
+创建了登陆和注册组件和它们的route。

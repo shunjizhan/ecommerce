@@ -8,6 +8,7 @@ import Dashboard from './admin/Dashboard'
 import PrivateRoute from './admin/PrivateRoute'
 import AdminRoute from './admin/AdminRoute'
 import AdminDashboard from './admin/AdminDashboard'
+import AddCategory from './admin/AddCategory'
 
 const Routes = () => {
   return (
@@ -19,6 +20,7 @@ const Routes = () => {
         <Route path='/signup' component={ Signup } />
         <PrivateRoute path='/user/dashboard' component={ Dashboard } />
         <AdminRoute path='/admin/dashboard' component={ AdminDashboard } />
+        <AdminRoute path='/create/category' component={ AddCategory } />
       </Switch>
     </HashRouter>
   )

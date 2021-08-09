@@ -366,3 +366,38 @@ const Routes = () => {
 
 ## 10) Admin Dashboard添加UI
 略
+
+## 11) 添加分类组件
+创建了一个添加分类组件`AddCategory`,这里可以复用到我们刚才创建的`AdminRoute`。
+```tsx
+// src/components/Routes.tsx
+<AdminRoute path='/create/category' component={ AddCategory } />
+```
+
+AddCategory用到的数据流是每当form提交的时候，更新本地的state，又用一个effect来监听这个state，当state变化的时候就发送axios。
+
+```tsx
+const AddCategory = () => {
+  const [name, setName] = useState<string>("")
+  const { user, token } = isAuth() as Jwt
+
+  useEffect(() => {
+    async function addCategory() {
+      ... // 发送axios
+    }
+
+    name && addCategory();
+  }, [name])
+
+  const onFinish = (value: { name: string }) => {
+    setName(value.name)
+  }
+  return (
+    <Layout title="添加分类" subTitle="">
+      <Form onFinish={ onFinish }>
+         ...
+      </Form>
+    </Layout>
+  )
+}
+```

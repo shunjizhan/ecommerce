@@ -75,3 +75,147 @@ const store = createStore(createRootReducer(history), applyMiddleware(routerMidd
 
 ## 5) 登陆和注册组件
 创建了登陆和注册组件和它们的route。
+
+## 6) 用户注册的redux流程
+首先要创建一堆基础actions
+```ts
+// src/store/actions.ts
+export const SIGNUP = 'SIGNUP';
+export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS';
+export const SIGNUP_FAIL = 'SIGNUP_FAIL';
+
+export interface SignupPayload {
+  email: string,
+  name: string,
+  password: string,
+};
+
+export interface SignupAction {
+  type: typeof SIGNUP,
+  payload: SignupPayload,
+};
+
+export interface SignupSuccessAction {
+  type: typeof SIGNUP_SUCCESS,
+}
+
+export interface SignupFailAction {
+  type: typeof SIGNUP_FAIL,
+  msg: string,
+}
+
+export const signup = (payload: SignupPayload): SignupAction => ({
+  type: SIGNUP,
+  payload,
+});
+
+export const signupSuccess = (): SignupSuccessAction => ({
+  type: SIGNUP_SUCCESS,
+});
+
+export const signupFail = (msg: string): SignupFailAction => ({
+  type: SIGNUP_FAIL,
+  msg,
+});
+
+export type AuthType =
+  | SignupAction
+  | SignupSuccessAction
+  | SignupFailAction
+```
+
+然后在根据这些actions创建reducers
+```ts
+// src/store/reducers/auth.reducer.ts
+export interface AuthState {
+  signup: {
+    loaded: boolean,
+    success: boolean,
+  },
+};
+
+const initState: AuthState = {
+  signup: {
+    loaded: false,
+    success: false,
+  }
+}
+
+export default function authReducer (state = initState, aciton: AuthType) {
+  switch (aciton.type) {
+    case SIGNUP: ...
+    case SIGNUP_SUCCESS: ...
+    case SIGNUP_FAIL: ...
+  }
+}
+```
+
+然后创建saga的异步注册action
+```ts
+// src/store/sagas/auth.saga.ts
+import { put, takeEvery } from 'redux-saga/effects';
+import axios from 'axios';
+import { SIGNUP, SignupAction, signupFail, signupSuccess } from "../actions";
+import { API } from '../../config';
+
+function* handleSignup (action: SignupAction) {
+  try {
+    yield axios.post(`${API}/signup`, action.payload);
+    yield put(signupSuccess());
+  } catch (e) {
+    yield put(signupFail(e.response.data.error));
+  }
+}
+
+export default function* authSaga () {
+  yield takeEvery(SIGNUP, handleSignup);
+}
+```
+
+把注册action添加到rootSata中
+```ts
+import { all } from "redux-saga/effects";
+import authSaga from "./auth.saga";
+
+export default function* rootSaga () {
+  yield all([
+    authSaga(),
+  ]);
+}
+```
+
+最后就是在redux中注册saga middleware
+```ts
+// src/store/index.ts
+const sagaMiddleware = createSagaMiddleware()
+
+const store = createStore(
+  createRootReducer(history),
+  applyMiddleware(
+    routerMiddleware(history),
+    sagaMiddleware
+  )
+);
+
+sagaMiddleware.run(rootSaga);
+
+export default store;
+```
+
+有了saga的middleware和注册的action，我们就可以在注册的时候直接dispatch这个action
+```tsx
+const Signup = () => {
+  const dispatch = useDispatch();
+  const handleSignup = (data: SignupPayload) => {
+    dispatch(signup(data));
+  }
+
+  return (
+    <Layout title='注册' subTitle=''>
+      <Form onFinish= { handleSignup }>
+        ...
+      </Form>
+    </Layout>
+  )
+}
+```

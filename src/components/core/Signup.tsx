@@ -1,11 +1,18 @@
 import { Button, Form, Input } from 'antd'
 import React from 'react'
+import { useDispatch } from 'react-redux';
+import { signup, SignupPayload } from '../../store/actions'
 import Layout from './Layout'
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const handleSignup = (data: SignupPayload) => {
+    dispatch(signup(data));
+  }
+
   return (
     <Layout title='注册' subTitle=''>
-      <Form>
+      <Form onFinish= { handleSignup }>
         <Form.Item name='name' label='昵称'>
           <Input />
         </Form.Item>

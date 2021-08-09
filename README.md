@@ -69,3 +69,6 @@ const store = createStore(createRootReducer(history), applyMiddleware(routerMidd
 
 ## 3) 创建导航
 用antd的导航组件
+
+## 4) 页头
+用antd的PageHeader组件，并且加上了一些很酷的css

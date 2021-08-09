@@ -5,7 +5,7 @@ import Layout from './Layout'
 const Shop = () => {
   const state = useSelector(state => state);
   return (
-    <Layout>
+    <Layout title='商城' subTitle='买买买'>
       Shop     
     </Layout>
   )

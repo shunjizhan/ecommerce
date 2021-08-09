@@ -219,3 +219,6 @@ const Signup = () => {
   )
 }
 ```
+
+## 7) 处理注册结果
+这里主要使用到useSelector来拿到当前的signup状态，然后根据状态用Result组件来表示给用户看。

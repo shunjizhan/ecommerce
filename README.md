@@ -317,3 +317,49 @@ const Navigation = () => {
 }
 ```
 
+## 9) 受保护的dashboard组件
+我们想要实现用户必须要登陆才能访问dashboard，否则就跳转到signin界面。这跟上一步有一点区别，上一步是直接在同一个route的同一个组件中判断要显示什么内容，所以比较直接。这里我们想要如果用户没有登陆，就不能访问某个route，所以要创建一个privateRoute来实现（不一定要叫这个名），原理就是与其在route里面直接用`<Route path='/xxx/>`，我们用render prop的方式判断应该返回什么Route.
+
+```tsx
+// src/components/admin/PrivateRoute.tsx
+import React, { FC } from 'react'
+import { Redirect, Route, RouteProps } from 'react-router-dom'
+import { isAuth } from '../../helpers/auth'
+
+interface PrivateRouteProps extends RouteProps {
+  component: React.ComponentType<any>,
+}
+
+const PrivateRoute: FC<PrivateRouteProps> = ({
+  component: Component,
+  ...rest
+}) => {
+  return (
+    <Route
+      render={ props => {
+        const auth = isAuth();
+        if (auth) {
+          return <Component { ...props } />
+        }
+        return <Redirect to='/signin' />
+      }}
+      { ...rest }
+    />
+  )
+}
+```
+
+```tsx
+// src/components/Routes.tsx
+const Routes = () => {
+  return (
+    <HashRouter>
+      <Switch>
+        <Route path='/' component={ Home } exact />
+        ...
+        <PrivateRoute path='/user/dashboard' component={ Dashboard } />
+      </Switch>
+    </HashRouter>
+  )
+}
+```

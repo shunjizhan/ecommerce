@@ -4,7 +4,6 @@ import Layout from './Layout'
 
 const Shop = () => {
   const state = useSelector(state => state);
-  console.log(state);
   return (
     <Layout>
       Shop     

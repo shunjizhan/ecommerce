@@ -1,10 +1,12 @@
 import { combineReducers } from "redux";
-import { connectRouter } from 'connected-react-router';
-import testReducer from "./test.reducer";
+import { connectRouter, RouterState } from 'connected-react-router';
 import { History } from 'history';
 
+export interface AppState {
+  router: RouterState,
+}
+
 const createRootReducer = (history: History) => combineReducers({
-  test: testReducer,
   router: connectRouter(history),
 });
 

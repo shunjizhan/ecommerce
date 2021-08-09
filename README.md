@@ -66,3 +66,6 @@ export const history = createHashHistory();
 
 const store = createStore(createRootReducer(history), applyMiddleware(routerMiddleware(history)));
 ```
+
+## 3) 创建导航
+用antd的导航组件

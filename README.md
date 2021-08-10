@@ -429,3 +429,83 @@ export interface ProductState {
 
 ## 15) 商品详情展示页
 这个是比较经典的整个流程：在挂载以后dispatch一个action给saga，saga再做一些异步的fetch拿data，并且再dispatch一个action，把拿到的数据存在store里面，然后组件用useSelector拿到这个数据，然后展示。
+
+## 16) 购物车
+购物车的数据主要是存储在localStorage里面，这样用户就算刷新界面数据也不会消失,不需要跟redux交互。
+```ts
+// src/helpers/cart.ts
+export const addItem = (item: Product, cb: () => void) => {
+  let cart: CartItem[] = []
+  if (typeof window !== "undefined") {
+    if (localStorage.getItem("cart")) {
+      cart = JSON.parse(localStorage.getItem("cart")!)
+    }
+    cart.push({
+      ...item,
+      count: 1
+    })
+  }
+  cart = Array.from(new Set(cart.map(item => item._id))).map(item => {
+    return cart.find(product => product._id === item)
+  }) as CartItem[]
+
+  localStorage.setItem("cart", JSON.stringify(cart))
+
+  cb()
+}
+```
+
+这里也用到另外一种共享数据的方式：使用context。
+我们创建另一个'store'，其实就是个context，然后把整个app包进它的provider里面，然后navigation就可以通过context拿到这个store的数据。
+
+```tsx
+// src/anotherStore.tsx
+import React, { Dispatch, useState, SetStateAction, FC } from "react"
+import { itemCount } from "./helpers/cart"
+
+// 这里其实本来可以直接createContext(),但是ts要求一个默认值。
+export const TotalContext = React.createContext<
+  [number, Dispatch<SetStateAction<number>>]
+>([0, () => null])
+
+interface Props {
+  children: React.ReactNode
+}
+
+const AnotherStore: FC<Props> = ({ children }) => {
+  const [count, setCount] = useState(itemCount())   // itemCount()就是从localstorage里拿cart数据然后计算
+  return (
+    // 现在全局都可以共享这个hook: [count, setCount]
+    <TotalContext.Provider value={[count, setCount]}>
+      { children }
+    </TotalContext.Provider>
+  )
+}
+
+export default AnotherStore
+```
+
+把整个App包裹进AnotherStore的provider里面
+```tsx
+function App() {
+  return (
+    <Provider store={ store }>
+      <ConnectedRouter history={ history }>
+        <AnotherStore>
+          <Routes />
+        </AnotherStore>
+      </ConnectedRouter>
+    </Provider>
+  );
+}
+```
+
+```tsx
+import { TotalContext } from '../../anotherStore';
+
+...
+// 在组件里面
+const [count, setCount] = useContext(TotalContext)
+
+<Badge count={ count } />
+```

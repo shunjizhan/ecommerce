@@ -426,3 +426,6 @@ export interface ProductState {
 ```
 
 结果展示部分基本就是正常的代码，略。
+
+## 15) 商品详情展示页
+这个是比较经典的整个流程：在挂载以后dispatch一个action给saga，saga再做一些异步的fetch拿data，并且再dispatch一个action，把拿到的数据存在store里面，然后组件用useSelector拿到这个数据，然后展示。

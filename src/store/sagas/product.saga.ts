@@ -9,6 +9,9 @@ import {
   FilterProductAction,
   filterProductSuccess,
   FILTER_PRODUCT,
+  GET_PRODUCT_BY_ID,
+  GetProductByIdAction,
+  getProductByIdSuccess,
 } from "../actions"
 import axios from "axios"
 import { API } from "../../config"
@@ -30,12 +33,18 @@ function* handleSearchProduct({ payload: { search, category } }: SearchProductAc
 }
 
 function* handleFilterProduct(action: FilterProductAction): any {
-  let response = yield axios.post(`${API}/products/filter`, action.payload)
+  const response = yield axios.post(`${API}/products/filter`, action.payload)
   yield put(filterProductSuccess(response.data, action.payload.skip))
+}
+
+function* handleGetProductById({ payload }: GetProductByIdAction): any {
+  const response = yield axios.get(`${API}/product/${payload.productId}`)
+  yield put(getProductByIdSuccess(response.data))
 }
 
 export default function* productSaga() {
   yield takeEvery(GET_PRODUCT, handleGetProduct)
   yield takeEvery(SEARCH_PRODUCT, handleSearchProduct)
   yield takeEvery(FILTER_PRODUCT, handleFilterProduct)
+  yield takeEvery(GET_PRODUCT_BY_ID, handleGetProductById)
 }

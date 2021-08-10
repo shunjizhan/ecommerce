@@ -5,6 +5,8 @@ import {
   SEARCH_PRODUCT_SUCCESS,
   FILTER_PRODUCT,
   FILTER_PRODUCT_SUCCESS,
+  GET_PRODUCT_BY_ID,
+  GET_PRODUCT_BY_ID_SUCCESS,
 } from "../actions"
 import { Product } from "../models/product"
 
@@ -135,6 +137,25 @@ export default function productReducer(
           }
         }
       }
+    case GET_PRODUCT_BY_ID:
+      return {
+        ...state,
+        product: {
+          ...state.product,
+          loaded: false,
+          success: false
+        }
+      }
+    case GET_PRODUCT_BY_ID_SUCCESS: {
+      return {
+        ...state,
+        product: {
+          loaded: true,
+          success: true,
+          result: action.payload
+        }
+      }
+    }
     
     default:
       return state

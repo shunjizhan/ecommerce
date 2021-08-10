@@ -1,7 +1,10 @@
 import {
   ProductUnionType,
   GET_PRODUCT,
-  GET_PRODUCT_SUCCESS
+  GET_PRODUCT_SUCCESS,
+  SEARCH_PRODUCT_SUCCESS,
+  FILTER_PRODUCT,
+  FILTER_PRODUCT_SUCCESS,
 } from "../actions"
 import { Product } from "../models/product"
 
@@ -21,7 +24,15 @@ export interface ProductState {
     success: boolean
     result: Product
   }
-  search: Product[]
+  search: Product[],
+  filter: {
+    loaded: boolean
+    success: boolean
+    result: {
+      size: number
+      data: Product[]
+    }
+  },
 }
 
 const initialState: ProductState = {
@@ -55,6 +66,14 @@ const initialState: ProductState = {
     }
   },
   search: [],
+  filter: {
+    success: false,
+    loaded: false,
+    result: {
+      size: 0,
+      data: []
+    }
+  },
 }
 
 export default function productReducer(
@@ -78,6 +97,42 @@ export default function productReducer(
           loaded: true,
           success: true,
           products: action.payload
+        }
+      }
+
+    case SEARCH_PRODUCT_SUCCESS:
+      return {
+        ...state,
+        search: action.products
+      }
+
+    case FILTER_PRODUCT:
+      return {
+        ...state,
+        filter: {
+          loaded: false,
+          success: false,
+          result: {
+            size: 0,
+            data: state.filter.result.data
+          }
+        }
+      }
+
+    case FILTER_PRODUCT_SUCCESS:
+      const data = action.skip === 0
+          ? action.payload.data
+          : [...state.filter.result.data, ...action.payload.data]
+
+      return {
+        ...state,
+        filter: {
+          loaded: true,
+          success: true,
+          result: {
+            size: action.payload.size,
+            data
+          }
         }
       }
     

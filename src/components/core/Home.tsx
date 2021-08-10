@@ -2,7 +2,7 @@ import { Col, Row, Typography } from "antd"
 import React, { useEffect } from "react"
 import Layout from "./Layout"
 import ProductItem from "./ProductItem"
-// import Search from "./Search"
+import Search from "./Search"
 import { useDispatch, useSelector } from "react-redux"
 import { getProduct } from "../../store/actions"
 import { AppState } from "../../store/reducers/index"
@@ -24,7 +24,7 @@ const Home = () => {
 
   return (
     <Layout title="拉勾电商" subTitle="欢迎来到拉勾电商, 尽情享受吧">
-      {/* <Search /> */}
+      <Search />
       <Title level={5}>最新上架</Title>
       <Row gutter={[16, 16]}>
         {createdAt.products.map(item => (

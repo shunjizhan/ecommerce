@@ -407,3 +407,22 @@ const AddCategory = () => {
 
 ## 13) 首页商品展示
 略
+
+## 14) 搜索和筛选功能
+这里的搜索和筛选都是后端搜索，调用接口然后单独存一份到store里，而完全没有用到前端搜索，比如先拿到所有数据，然后用reslect来对搜索和筛选分别做类似computed的结果，这样就只用存一份数据。
+```ts
+export interface ProductState {
+  ...
+  search: Product[],      // 这里存了搜索结果的数据
+  filter: {               // 这里存了筛选结果的数据
+    loaded: boolean
+    success: boolean
+    result: {
+      size: number
+      data: Product[]
+    }
+  },
+}
+```
+
+结果展示部分基本就是正常的代码，略。
